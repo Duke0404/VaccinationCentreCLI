@@ -9,5 +9,8 @@
         "string": "cpp",
         "iosfwd": "cpp",
         "stdexcept": "cpp"
-    }
+    },
+
+    // Whether git is enabled.
+    "git.enabled": false,
 }

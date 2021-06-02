@@ -49,6 +49,7 @@ class Date {
     Date& operator++();
     bool operator==(const Date& RHS) const;
     friend ostream& operator<<(ostream& out, const Date& date);
+    //friend istream& operator>>(std::istream& in, Date& date);
 };
 
 class Appointment {
@@ -216,6 +217,3 @@ class Centre {
 
 //Universal function to input and verify Integers
 unsigned int inputInt(unsigned int a, unsigned int b, istream& in);
-
-Date inputDate(Date a, Date b, istream& in);
-Time inputTime(Time a, Time b, istream& in);

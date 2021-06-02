@@ -180,6 +180,28 @@ ostream& operator<<(ostream& out, const Date& date) {
     return out;
 }
 
+// istream& operator>>(std::istream& in, Date& date) {
+//     stringstream temp;
+
+//     do {
+//         try{
+//             in >> temp;
+//             break;
+//         }
+
+//         catch(invalid_argument &error) {
+//             in.clear();
+//             in.ignore(numeric_limits<streamsize>::max(),'\n');
+//             cout << error;
+//         }
+//     }
+    
+//     while (true);
+
+//     temp 
+
+// }
+
 /*----------------------------------------------------------------------------------------------------------------------------*/
 
 Time Appointment::getTime() const {
@@ -750,12 +772,15 @@ void Centre::myAppointmentsPage() {
 }
 
 void Centre::newAppointmentsPage() {
+    Date selectDate;
+
     cout << "BOOK APPOINTMENT" << endl;
 
     for(auto i = dayList.begin(); i != dayList.end(); ++i) {
         cout << *i << endl;
     }
 
+    cout << "Select date" << endl;
     
 }
 
