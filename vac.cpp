@@ -17,6 +17,7 @@ void Time::setMinute(unsigned int min) {
     
 }
 
+
 void Time::setHour(unsigned int hou) {
     if(hou > 24)
         throw invalid_argument("Hours Cannot be greater than 23");
@@ -179,28 +180,6 @@ ostream& operator<<(ostream& out, const Date& date) {
 
     return out;
 }
-
-// istream& operator>>(std::istream& in, Date& date) {
-//     stringstream temp;
-
-//     do {
-//         try{
-//             in >> temp;
-//             break;
-//         }
-
-//         catch(invalid_argument &error) {
-//             in.clear();
-//             in.ignore(numeric_limits<streamsize>::max(),'\n');
-//             cout << error;
-//         }
-//     }
-    
-//     while (true);
-
-//     temp 
-
-// }
 
 /*----------------------------------------------------------------------------------------------------------------------------*/
 
@@ -803,3 +782,59 @@ unsigned int inputInt(unsigned int a, unsigned int b, istream& in) {
 
     return input;
 }
+
+Date inputDate(Date a, Date b, istream& in) {
+    Date result;
+    string temp;
+    unsigned int day, month, year;
+
+    do {
+        try{
+            in >> temp;
+
+            unsigned int i;
+
+            day = stoi(temp.substr(0, temp.find_first_of("-")));
+            month = stoi(temp.substr(temp.find_first_of("-"), temp.find_last_of("-")));
+            month = stoi(temp.substr(temp.find_last_of("-"), temp.length()));
+
+            result.setYear(year);
+            result.setMonth(month);
+            result.setDay(day);
+
+            break;
+        }
+
+        catch(invalid_argument &error) {
+            in.clear();
+            in.ignore(numeric_limits<streamsize>::max(),'\n');
+            cout << error.what();
+        }
+    }
+    
+    while (true);
+
+
+}
+
+//istream& operator>>(std::istream& in, Date& date) {
+//     stringstream temp;
+
+    // do {
+    //     try{
+    //         in >> temp;
+    //         break;
+    //     }
+
+    //     catch(invalid_argument &error) {
+    //         in.clear();
+    //         in.ignore(numeric_limits<streamsize>::max(),'\n');
+    //         cout << error;
+    //     }
+    // }
+    
+    // while (true);
+
+//     temp 
+
+// }

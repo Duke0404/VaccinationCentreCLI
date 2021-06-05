@@ -217,3 +217,4 @@ class Centre {
 
 //Universal function to input and verify Integers
 unsigned int inputInt(unsigned int a, unsigned int b, istream& in);
+Date inputDate(Date a, Date b, istream& in);

@@ -531,6 +531,8 @@ cout << "-- Checking setters" << endl;
         cout << "-- -- NOT WORKING" << endl;
 }
 
-
+cout << "Testing Public Functions" << endl;
+cout << "-- Checking Date input" << endl;
+{
 
 }
