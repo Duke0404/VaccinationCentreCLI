@@ -698,6 +698,8 @@ bool Centre::checkAppointmentByID(unsigned int ID) {
 }
 
 bool Centre::checkAppointmentByTime(Date date, Time time) {
+    cout << getDayByDate(date);
+
     try {
         return !getDayByDate(date).getAppointmentByTime(time).getBooked();
     }
@@ -920,7 +922,7 @@ Date inputDate(istream& in) {
         try{
             day = stoi(temp.substr(0, 2));
             month = stoi(temp.substr(3, 2));
-            year = stoi(temp.substr(6, 2));
+            year = stoi(temp.substr(6, 4));
 
             result.setYear(year);
             result.setMonth(month);
