@@ -48,8 +48,10 @@ class Date {
     Date operator+(const Date& RHS);
     Date& operator++();
     bool operator==(const Date& RHS) const;
+    bool operator!=(const Date& RHS) const;
+    friend bool operator<(const Date& LHS, const Date& RHS);
+    friend bool operator>(const Date& LHS, const Date& RHS);
     friend ostream& operator<<(ostream& out, const Date& date);
-    //friend istream& operator>>(std::istream& in, Date& date);
 };
 
 class Appointment {
@@ -69,6 +71,8 @@ class Appointment {
     Appointment();
     Appointment(Time time, unsigned int ID);
 
+    bool operator==(const Appointment &RHS) const;
+    bool operator!=(const Appointment &RHS) const;
     friend ostream& operator<<(ostream& out, const Appointment& appointment);
 };
 
@@ -94,6 +98,8 @@ class Day {
     bool checkAppointmentByID(unsigned int ID);
     void regenSchedule(unsigned int appointmentsPerDay, Time startTime);
     void setAppointment(unsigned int ID, Time time);
+    bool operator==(const Day &RHS) const;
+    bool operator!=(const Day &RHS) const;
     friend ostream& operator<<(ostream& out, const Day& day);
 };
 
@@ -192,6 +198,7 @@ class Centre {
 
     void setName(string name);
     void setAddress(string address);
+    
     void setAllocatedDays(unsigned int allocatedDays);
     void setAppointmentsPerDay(unsigned int appointmentsPerDay);
     void setStartTime(Time startTime);
@@ -204,7 +211,9 @@ class Centre {
     void addCustomer(unsigned int login, unsigned int password, string name);
 
     Day getDayByID(unsigned int ID);
+    Day getDayByDate(Date date);
     bool checkAppointmentByID(unsigned int ID);
+    bool checkAppointmentByTime(Date date, Time time);
     void regenSchedule(unsigned int allocatedDays, Date startDate, unsigned int appointmentsPerDay, Time startTime);
 
     void startPage();
@@ -217,4 +226,5 @@ class Centre {
 
 //Universal function to input and verify Integers
 unsigned int inputInt(unsigned int a, unsigned int b, istream& in);
-Date inputDate(Date a, Date b, istream& in);
+Date inputDate(istream& in);
+Time inputTime(istream& in);

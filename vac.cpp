@@ -172,7 +172,45 @@ Date& Date::operator++() {
 }
 
 bool Date::operator==(const Date& RHS) const {
-    return day == RHS.day && month == RHS.month && year == RHS.year;
+    return (day == RHS.day) && (month == RHS.month) && (year == RHS.year);
+}
+
+bool Date::operator!=(const Date& RHS) const {
+    return !(day == RHS.day && month == RHS.month && year == RHS.year);
+}
+
+bool operator<(const Date& LHS, const Date& RHS) {
+    if(LHS.year < RHS.year)
+        return true;
+
+    else if(LHS.year == RHS.year) {
+        if(LHS.month < RHS.month)
+            return true;
+
+        else if(LHS.month == RHS.month) {
+            if(LHS.day < RHS.day)
+                return true;
+        }
+    }
+
+    return false;
+}
+
+bool operator>(const Date& LHS, const Date& RHS) {
+    if(LHS.year > RHS.year)
+        return true;
+
+    else if(LHS.year == RHS.year) {
+        if(LHS.month > RHS.month)
+            return true;
+
+        else if(LHS.month == RHS.month) {
+            if(LHS.day > RHS.day)
+                return true;
+        }
+    }
+
+    return false;
 }
 
 ostream& operator<<(ostream& out, const Date& date) {
@@ -216,6 +254,14 @@ Appointment::Appointment(Time time, unsigned int ID) {
 
 void Appointment::setBooked() {
     booked = !booked;
+}
+
+bool Appointment::operator==(const Appointment &RHS) const {
+    return time == RHS.time && appointeeID == RHS.appointeeID && booked == RHS.booked;
+}
+
+bool Appointment::operator!=(const Appointment &RHS) const {
+    return !(time == RHS.time && appointeeID == RHS.appointeeID && booked == RHS.booked);
 }
 
 ostream& operator<<(ostream& out, const Appointment& appointment) {
@@ -312,7 +358,34 @@ void Day::setAppointment(unsigned int ID, Time time) {
     refAppointmentByTime(time).setBooked();
 }
 
+bool Day::operator==(const Day &RHS) const {
+    if(date != RHS.date || allocated != RHS.allocated || appointmentList.size() != RHS.appointmentList.size())
+        return false;
+
+    
+    for(auto i = appointmentList.begin(), j = RHS.appointmentList.begin(); i != appointmentList.end() && j != appointmentList.end(); ++i, ++j) {
+        if((*i) != (*j))
+            return false;
+    }
+
+    return true;
+}
+
+bool Day::operator!=(const Day &RHS) const {
+    if(date != RHS.date || allocated != RHS.allocated)
+        return true;
+
+    for(auto i = appointmentList.begin(), j = RHS.appointmentList.begin(); i != appointmentList.end() || j != appointmentList.end(); ++i, ++j) {
+        if((*i) != (*j))
+            return true;
+    }
+
+    return false;
+}
+
 ostream& operator<<(ostream& out, const Day& day) {
+    out << day.date << endl;
+
     for(auto i = day.appointmentList.begin(); i != day.appointmentList.end(); ++i) {
         out << *i << endl;
     }
@@ -500,6 +573,24 @@ Customer::Customer(unsigned int ID, unsigned int PIN, string name) {
 
 /*----------------------------------------------------------------------------------------------------------------------------*/
 
+Day& Centre::refDayByDate(Date date) {
+    for(auto i = dayList.begin(); i != dayList.end(); ++i) {
+        if ((*i).getDate() == date)
+            return *i;
+    }
+
+    throw invalid_argument("No Allocated Day at given Date");
+}
+
+Customer& Centre::refCustomerByID(unsigned int ID) {
+    for(auto i = customerList.begin(); i != customerList.end(); ++i) {
+        if ((*i).getID() == ID)
+            return *i;
+    }
+
+    throw invalid_argument("No customer with given ID");
+}
+
 string Centre::getName() {
     return name;
 }
@@ -591,10 +682,24 @@ Day Centre::getDayByID(unsigned int ID) {
     throw invalid_argument("No customer with such ID exists");
 }
 
+Day Centre::getDayByDate(Date date) {
+    return refDayByDate(date);
+}
+
 bool Centre::checkAppointmentByID(unsigned int ID) {
     try {
         getDayByID(ID).getAppointmentByID(ID);
         return true;
+    }
+
+    catch(invalid_argument& err) {
+        return false;
+    }
+}
+
+bool Centre::checkAppointmentByTime(Date date, Time time) {
+    try {
+        return !getDayByDate(date).getAppointmentByTime(time).getBooked();
     }
 
     catch(invalid_argument& err) {
@@ -615,7 +720,7 @@ void Centre::regenSchedule(unsigned int allocatedDays, Date startDate, unsigned 
     for(auto i = dayList.begin(); i != dayList.end(); ++i) {
         (*i).setDate(date);
         (*i).regenSchedule(appointmentsPerDay, startTime);
-        (*i).setAllocated();
+        //(*i).setAllocated();
         ++date;
     }
 }
@@ -752,6 +857,7 @@ void Centre::myAppointmentsPage() {
 
 void Centre::newAppointmentsPage() {
     Date selectDate;
+    Time selectTime;
 
     cout << "BOOK APPOINTMENT" << endl;
 
@@ -759,8 +865,28 @@ void Centre::newAppointmentsPage() {
         cout << *i << endl;
     }
 
-    cout << "Select date" << endl;
-    
+    do {
+        cout << "Enter date of appointment in \"dd-mm-yyyy\" format" << endl
+        << "---------------" << endl;
+        selectDate = inputDate(cin);
+        cout << "---------------" << endl;
+
+        cout << "Enter time of appointment in \"hh:mm\" format" << endl
+        << "---------------" << endl;
+        selectTime = inputTime(cin);
+        cout << "---------------" << endl;
+
+        if(checkAppointmentByTime(selectDate, selectTime))
+            break;
+
+        else {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(),'\n');
+            cout << "Please enter slot details of available slot " << endl;
+        }
+    }
+
+    while(true);
 }
 
 unsigned int inputInt(unsigned int a, unsigned int b, istream& in) {
@@ -783,20 +909,18 @@ unsigned int inputInt(unsigned int a, unsigned int b, istream& in) {
     return input;
 }
 
-Date inputDate(Date a, Date b, istream& in) {
+Date inputDate(istream& in) {
     Date result;
     string temp;
     unsigned int day, month, year;
 
     do {
+        in >> temp;
+
         try{
-            in >> temp;
-
-            unsigned int i;
-
-            day = stoi(temp.substr(0, temp.find_first_of("-")));
-            month = stoi(temp.substr(temp.find_first_of("-"), temp.find_last_of("-")));
-            month = stoi(temp.substr(temp.find_last_of("-"), temp.length()));
+            day = stoi(temp.substr(0, 2));
+            month = stoi(temp.substr(3, 2));
+            year = stoi(temp.substr(6, 2));
 
             result.setYear(year);
             result.setMonth(month);
@@ -814,27 +938,35 @@ Date inputDate(Date a, Date b, istream& in) {
     
     while (true);
 
-
+    return result;
 }
 
-//istream& operator>>(std::istream& in, Date& date) {
-//     stringstream temp;
+Time inputTime(istream& in) {
+    Time result;
+    string temp;
+    unsigned int hour, min;
 
-    // do {
-    //     try{
-    //         in >> temp;
-    //         break;
-    //     }
+    do {
+        in >> temp;
 
-    //     catch(invalid_argument &error) {
-    //         in.clear();
-    //         in.ignore(numeric_limits<streamsize>::max(),'\n');
-    //         cout << error;
-    //     }
-    // }
+        try{
+            hour = stoi(temp.substr(0, 2));
+            min = stoi(temp.substr(3, 2));
+
+            result.setHour(hour);
+            result.setMinute(min);
+
+            break;
+        }
+
+        catch(invalid_argument &error) {
+            in.clear();
+            in.ignore(numeric_limits<streamsize>::max(),'\n');
+            cout << error.what();
+        }
+    }
     
-    // while (true);
+    while (true);
 
-//     temp 
-
-// }
+    return result;
+}

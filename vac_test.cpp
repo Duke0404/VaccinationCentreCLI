@@ -531,8 +531,28 @@ cout << "-- Checking setters" << endl;
         cout << "-- -- NOT WORKING" << endl;
 }
 
-cout << "Testing Public Functions" << endl;
-cout << "-- Checking Date input" << endl;
+/*----------------------------------------------------------------------------------------------------------------------------*/
+
+cout << "Testing CENTRE class" << endl;
+cout << "Checking getDayByDate" << endl;
 {
+    Centre centreTest;
+    Day dayTest;
+    Date dateTest(6, 6, 21);
+    Time timeTest(12, 0);
+
+    centreTest.regenSchedule(2, dateTest, 3, timeTest);
+    dayTest.setDate(dateTest);
+    dayTest.regenSchedule(3, timeTest);
+
+    if(centreTest.getDayByDate(dateTest) == dayTest)
+        cout << "-- -- OK" << endl;
+
+    else
+        cout << "-- -- NOT WORKING" << endl
+        << centreTest.getDayByDate(dateTest).getDate() << " " << dayTest.getDate() << endl
+        << centreTest.getDayByDate(dateTest).getAllocated() << " " << dayTest.getAllocated() << endl
+        << centreTest.getDayByDate(dateTest);
+}
 
 }
