@@ -92,6 +92,7 @@ class Day {
 
     void setDate(Date date);
     void setAllocated();
+    void setAppointment(Time time, unsigned int ID);
 
     Day();
 
@@ -106,16 +107,19 @@ class Day {
 class Shipment {
     Date expiry;
     unsigned int quantity;
+    unsigned int index;
 
     public:
     Date getExpiry();
     unsigned int getQuantity();
+    unsigned int getIndex();
 
     void setExpiry(Date exp);
     void setQuantity(unsigned int qty);
+    void setIndex(unsigned int index);
 
     Shipment();
-    Shipment(Date exp, unsigned int qty);
+    Shipment(Date exp, unsigned int qty, unsigned int index);
 
     void reduceQuantity();
 };
@@ -127,6 +131,9 @@ class Vaccine {
     Date bestBefore;
     list<Shipment> shipmentList;
     bool available;
+
+    Shipment& refBestShipment();
+    Shipment& refShipmentByIndex(unsigned int index);
 
     public:
     unsigned int getTag();
@@ -144,8 +151,10 @@ class Vaccine {
     Vaccine();
     Vaccine(unsigned int tag, string company, unsigned int dosesReq, Date bestBefore);
 
-    void restock(unsigned int qty, Date currDate);
+    Shipment getBestShipment();
+    Shipment getShipmentByIndex(unsigned int index);
 
+    void restock(unsigned int qty, Date currDate, unsigned int idx);
 };
 
 class Customer {
@@ -173,7 +182,6 @@ class Customer {
 
     Customer();
     Customer(unsigned int ID, unsigned int PIN, string name);
-
 };
 
 class Centre {
@@ -202,6 +210,7 @@ class Centre {
     void setAllocatedDays(unsigned int allocatedDays);
     void setAppointmentsPerDay(unsigned int appointmentsPerDay);
     void setStartTime(Time startTime);
+    void setAppointment(Date date, Time time, unsigned int ID);
 
     Centre();
     Centre(string name, string address, unsigned int allocatedDays, unsigned int appointmentsPerDay, Time startTime);
@@ -212,6 +221,7 @@ class Centre {
 
     Day getDayByID(unsigned int ID);
     Day getDayByDate(Date date);
+    bool checkDayByID(unsigned int ID);
     bool checkAppointmentByID(unsigned int ID);
     bool checkAppointmentByTime(Date date, Time time);
     void regenSchedule(unsigned int allocatedDays, Date startDate, unsigned int appointmentsPerDay, Time startTime);
@@ -224,7 +234,7 @@ class Centre {
     void newAppointmentsPage();
 };
 
-//Universal function to input and verify Integers
+//Global function to input and verify Integers
 unsigned int inputInt(unsigned int a, unsigned int b, istream& in);
 Date inputDate(istream& in);
 Time inputTime(istream& in);

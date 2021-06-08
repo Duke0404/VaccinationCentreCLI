@@ -28,8 +28,8 @@ bool checkDay(Day day, Date date, bool allocated) {
     return false;
 }
 
-bool checkShipment(Shipment shipment, Date exp, unsigned int qty) {
-    if(shipment.getExpiry() == exp && shipment.getQuantity() == qty)
+bool checkShipment(Shipment shipment, Date exp, unsigned int qty, unsigned int idx) {
+    if(shipment.getExpiry() == exp && shipment.getQuantity() == qty && shipment.getIndex() == idx)
         return true;
 
     return false;
@@ -439,7 +439,7 @@ cout << "-- Checking Default constructor" << endl;
 {
     Shipment shipmentTest;
     Date dateTest;
-    if(checkShipment(shipmentTest, dateTest, false))
+    if(checkShipment(shipmentTest, dateTest, false, 0))
         cout << "-- -- OK" << endl;
 
     else
@@ -449,8 +449,8 @@ cout << "-- Checking Default constructor" << endl;
 cout << "-- Checking int constructor" << endl;
 {
     Date dateTest(27, 5, 2021);
-    Shipment shipmentTest(dateTest, 1000);
-    if(checkShipment(shipmentTest, dateTest, 1000))
+    Shipment shipmentTest(dateTest, 1000, 1234);
+    if(checkShipment(shipmentTest, dateTest, 1000, 1234))
         cout << "-- -- OK" << endl;
 
     else
@@ -465,7 +465,7 @@ cout << "-- Checking setters" << endl;
     shipmentTest.setExpiry(dateTest);
     shipmentTest.setQuantity(10);
 
-    if(checkShipment(shipmentTest, dateTest, 10))
+    if(checkShipment(shipmentTest, dateTest, 10, 0))
         cout << "-- -- OK" << endl;
 
     else
@@ -475,11 +475,11 @@ cout << "-- Checking setters" << endl;
 cout << "-- Checking settersreduceQuantity" << endl;
 {
     Date dateTest;
-    Shipment shipmentTest(dateTest, 101);
+    Shipment shipmentTest(dateTest, 101, 1234);
 
     shipmentTest.reduceQuantity();
 
-    if(checkShipment(shipmentTest, dateTest, 100))
+    if(checkShipment(shipmentTest, dateTest, 100, 1234))
         cout << "-- -- OK" << endl;
 
     else

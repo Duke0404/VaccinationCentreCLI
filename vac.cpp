@@ -12,9 +12,7 @@ void Time::setMinute(unsigned int min) {
     if(min > 60)
         throw invalid_argument("Minutes Cannot be greater than 59");
     
-    minute = min;
-
-    
+    minute = min;  
 }
 
 
@@ -319,6 +317,11 @@ void Day::setAllocated() {
     allocated = !allocated;
 }
 
+void Day::setAppointment(Time time, unsigned int ID) {
+    refAppointmentByTime(time).setAppointeeID(ID);
+    refAppointmentByTime(time).setBooked();
+}
+
 Day::Day() {
     allocated = false;
 }
@@ -417,9 +420,10 @@ Shipment::Shipment() {
     quantity = 0;
 }
 
-Shipment::Shipment(Date exp, unsigned int qty) {
-    this->setExpiry(exp);
-    this->setQuantity(qty);
+Shipment::Shipment(Date exp, unsigned int qty, unsigned int index) {
+    setExpiry(exp);
+    setQuantity(qty);
+    setIndex(index);
 }
 
 void Shipment::reduceQuantity() {
@@ -430,6 +434,26 @@ void Shipment::reduceQuantity() {
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------*/
+
+Shipment& Vaccine::refBestShipment() {
+    unsigned int resultIndex;
+
+    for(auto i = shipmentList.begin(); i != shipmentList.end(); ++i) {
+        if ((*i).getExpiry() < getShipmentByIndex(resultIndex).getExpiry())
+            resultIndex = (*i).getIndex();
+    }
+
+    return refShipmentByIndex(resultIndex);
+}
+
+Shipment& Vaccine::refShipmentByIndex(unsigned int index) {
+    for(auto i = shipmentList.begin(); i != shipmentList.end(); ++i) {
+        if ((*i).getIndex() == index)
+            return *i;
+    }
+
+    throw invalid_argument("No shipment with given index");
+}
 
 unsigned int Vaccine::getTag() {
     return tag;
@@ -482,15 +506,23 @@ Vaccine::Vaccine() {
 }
 
 Vaccine::Vaccine(unsigned int tag, string company, unsigned int dosesReq, Date bestBefore) {
-    this->setTag(tag);
-    this->setCompany(company);
-    this->setDosesRequired(dosesReq);
-    this->setBestBefore(bestBefore);
+    setTag(tag);
+    setCompany(company);
+    setDosesRequired(dosesReq);
+    setBestBefore(bestBefore);
     available = false;
 }
 
-void Vaccine::restock(unsigned int qty, Date currDate) {
-    Shipment temp(currDate + bestBefore, qty);
+Shipment Vaccine::getBestShipment() {
+    return refBestShipment();
+}
+
+Shipment Vaccine::getShipmentByIndex(unsigned int index) {
+    return refShipmentByIndex(index);
+}
+
+void Vaccine::restock(unsigned int qty, Date currDate, unsigned int idx) {
+    Shipment temp(currDate + bestBefore, qty, idx);
     shipmentList.push_back(temp);
 }
 
@@ -625,6 +657,10 @@ void Centre::setStartTime(Time startTime) {
     this->startTime = startTime;
 }
 
+void Centre::setAppointment(Date date, Time time, unsigned int ID) {
+    refDayByDate(date).setAppointment(time, ID);
+}
+
 Centre::Centre() {
     name = "None";
     address = "None";
@@ -684,6 +720,17 @@ Day Centre::getDayByID(unsigned int ID) {
 
 Day Centre::getDayByDate(Date date) {
     return refDayByDate(date);
+}
+
+bool Centre::checkDayByID(unsigned int ID) {
+    try {
+        getDayByID(ID);
+        return true;
+    }
+
+    catch(invalid_argument &err) {
+        return false;
+    }
 }
 
 bool Centre::checkAppointmentByID(unsigned int ID) {
@@ -884,11 +931,30 @@ void Centre::newAppointmentsPage() {
         else {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(),'\n');
-            cout << "Please enter slot details of available slot " << endl;
+            cout << "Please select available slot " << endl;
         }
     }
 
     while(true);
+
+    if(checkDayByID(logged)) {
+        cout << "You already have an upcoming appointment" << endl;
+        myAppointmentsPage();
+    }
+
+    else if(getCustomerByID(logged).getOnDose()) {
+        setAppointment(selectDate, selectTime, logged);
+        menuPage();
+    }
+
+    else if(getCustomerByID(logged).getOnDose()) {
+        setAppointment(selectDate, selectTime, logged);
+        menuPage();
+    }
+
+    else {
+        
+    }
 }
 
 unsigned int inputInt(unsigned int a, unsigned int b, istream& in) {
