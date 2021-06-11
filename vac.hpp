@@ -46,6 +46,7 @@ class Date {
 
     Date& operator=(const Date& RHS);
     Date operator+(const Date& RHS);
+    Date operator-(const Date& RHS);
     Date& operator++();
     bool operator==(const Date& RHS) const;
     bool operator!=(const Date& RHS) const;
@@ -199,6 +200,7 @@ class Centre {
 
     Day& refDayByDate(Date date);
     Customer& refCustomerByID(unsigned int ID);
+    Vaccine& refVaccineByTag(unsigned int tag);
 
     public:
     string getName();
@@ -210,7 +212,11 @@ class Centre {
     void setAllocatedDays(unsigned int allocatedDays);
     void setAppointmentsPerDay(unsigned int appointmentsPerDay);
     void setStartTime(Time startTime);
+
     void setAppointment(Date date, Time time, unsigned int ID);
+    
+    void addVaccine(Vaccine vac);
+    void startDose(unsigned int ID, unsigned int tag);
 
     Centre();
     Centre(string name, string address, unsigned int allocatedDays, unsigned int appointmentsPerDay, Time startTime);
@@ -225,6 +231,9 @@ class Centre {
     bool checkAppointmentByID(unsigned int ID);
     bool checkAppointmentByTime(Date date, Time time);
     void regenSchedule(unsigned int allocatedDays, Date startDate, unsigned int appointmentsPerDay, Time startTime);
+
+    Vaccine getVaccineByTag(unsigned int tag);
+    Vaccine getBestVaccine();
 
     void startPage();
     void loginPage();

@@ -142,6 +142,35 @@ Date Date::operator+(const Date& RHS) {
     return result;
 }
 
+Date Date::operator-(const Date& RHS) {
+    unsigned int tempYear =  year - RHS.year;
+
+    int tempMonth =  month - RHS.month;
+    if(tempMonth < 0) {
+        --tempYear;
+        tempMonth += 12;
+    }
+
+    int tempDay =  day - RHS.day;
+    if(month - 1 == 2 && day < 0) {
+        --tempMonth;
+        tempDay += 28;
+    }
+
+    else if(month - 1 == (1 || 3 || 5 || 7 || 8 || 10 || 12) && day < 0) {
+        --tempMonth;
+        tempDay += 31;
+    }
+
+    else if(month - 1 == (4 || 6 || 9 || 11) && day < 0) {
+        --tempMonth;
+        tempDay += 30;
+    }
+    
+    Date result(tempDay, tempMonth, tempYear);
+    return result;
+}
+
 Date& Date::operator++() {
     if(month == 2 && day == 28) {
         ++month;
@@ -408,12 +437,20 @@ unsigned int Shipment::getQuantity() {
     return quantity;
 }
 
+unsigned int Shipment::getIndex() {
+    return index;
+}
+
 void Shipment::setExpiry(Date exp) {
     expiry = exp;
 }
 
 void Shipment::setQuantity(unsigned int qty) {
     quantity = qty;
+}
+
+void Shipment::setIndex(unsigned int index) {
+    this->index = index;
 }
 
 Shipment::Shipment() {
@@ -436,7 +473,7 @@ void Shipment::reduceQuantity() {
 /*----------------------------------------------------------------------------------------------------------------------------*/
 
 Shipment& Vaccine::refBestShipment() {
-    unsigned int resultIndex;
+    unsigned int resultIndex = shipmentList.front().getIndex();
 
     for(auto i = shipmentList.begin(); i != shipmentList.end(); ++i) {
         if ((*i).getExpiry() < getShipmentByIndex(resultIndex).getExpiry())
@@ -623,6 +660,15 @@ Customer& Centre::refCustomerByID(unsigned int ID) {
     throw invalid_argument("No customer with given ID");
 }
 
+Vaccine& Centre::refVaccineByTag(unsigned int tag) {
+    for(auto i = vaccineList.begin(); i != vaccineList.end(); ++i) {
+        if ((*i).getTag() == tag)
+            return *i;
+    }
+
+    throw invalid_argument("No vaccine with given tag is available");
+}
+
 string Centre::getName() {
     return name;
 }
@@ -659,6 +705,15 @@ void Centre::setStartTime(Time startTime) {
 
 void Centre::setAppointment(Date date, Time time, unsigned int ID) {
     refDayByDate(date).setAppointment(time, ID);
+}
+
+void Centre::addVaccine(Vaccine vac) {
+    vaccineList.push_back(vac);
+}
+
+void Centre::startDose(unsigned int ID, unsigned int tag) {
+    refCustomerByID(ID).setTag(tag);
+    refCustomerByID(ID).setOnDose();
 }
 
 Centre::Centre() {
@@ -745,8 +800,6 @@ bool Centre::checkAppointmentByID(unsigned int ID) {
 }
 
 bool Centre::checkAppointmentByTime(Date date, Time time) {
-    cout << getDayByDate(date);
-
     try {
         return !getDayByDate(date).getAppointmentByTime(time).getBooked();
     }
@@ -772,6 +825,23 @@ void Centre::regenSchedule(unsigned int allocatedDays, Date startDate, unsigned 
         //(*i).setAllocated();
         ++date;
     }
+}
+
+Vaccine Centre::getVaccineByTag(unsigned int tag) {
+    return refVaccineByTag(tag);
+}
+
+Vaccine Centre::getBestVaccine() {
+    Date left(1, 1, 1000);
+    unsigned int tempTag;
+
+    for(auto i = vaccineList.begin(); i != vaccineList.end(); ++i) {
+        if(((*i).getBestShipment().getExpiry() - currDate) < left)
+            left = (*i).getBestShipment().getExpiry() - currDate;
+            tempTag = (*i).getTag();
+    }
+
+    return getVaccineByTag(tempTag);
 }
 
 void Centre::startPage() {
@@ -862,9 +932,9 @@ void Centre::menuPage() {
     << "Enter number of the desired menu item" << endl
     << "(1) My appointments" << endl
     << "(2) Get vaccine appointment" << endl
-    << "(3) Change Name" << endl
-    << "(4) Change Login ID" << endl
-    << "(5) Change PIN" << endl
+    // << "(3) Change Name" << endl
+    // << "(4) Change Login ID" << endl
+    // << "(5) Change PIN" << endl
     << "(6) Logout" << endl
     << "(7) Quit" << endl
     << "---------------" << endl;
@@ -910,50 +980,59 @@ void Centre::newAppointmentsPage() {
 
     cout << "BOOK APPOINTMENT" << endl;
 
-    for(auto i = dayList.begin(); i != dayList.end(); ++i) {
-        cout << *i << endl;
-    }
-
-    do {
-        cout << "Enter date of appointment in \"dd-mm-yyyy\" format" << endl
-        << "---------------" << endl;
-        selectDate = inputDate(cin);
-        cout << "---------------" << endl;
-
-        cout << "Enter time of appointment in \"hh:mm\" format" << endl
-        << "---------------" << endl;
-        selectTime = inputTime(cin);
-        cout << "---------------" << endl;
-
-        if(checkAppointmentByTime(selectDate, selectTime))
-            break;
-
-        else {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(),'\n');
-            cout << "Please select available slot " << endl;
-        }
-    }
-
-    while(true);
-
-    if(checkDayByID(logged)) {
-        cout << "You already have an upcoming appointment" << endl;
+    if(checkAppointmentByID(logged)) {
+        cout << "You already have an appointment" << endl;
         myAppointmentsPage();
     }
 
-    else if(getCustomerByID(logged).getOnDose()) {
-        setAppointment(selectDate, selectTime, logged);
-        menuPage();
-    }
-
-    else if(getCustomerByID(logged).getOnDose()) {
-        setAppointment(selectDate, selectTime, logged);
-        menuPage();
-    }
-
     else {
-        
+        for(auto i = dayList.begin(); i != dayList.end(); ++i) {
+            cout << *i << endl;
+        }
+
+        do {
+            cout << "Enter date of appointment in \"dd-mm-yyyy\" format" << endl
+            << "---------------" << endl;
+            selectDate = inputDate(cin);
+            cout << "---------------" << endl;
+
+            cout << "Enter time of appointment in \"hh:mm\" format" << endl
+            << "---------------" << endl;
+            selectTime = inputTime(cin);
+            cout << "---------------" << endl;
+
+            if(checkAppointmentByTime(selectDate, selectTime))
+                break;
+
+            else {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(),'\n');
+                cout << "Please select available slot" << endl;
+            }
+        }
+
+        while(true);
+
+        if(checkDayByID(logged)) {
+            cout << "You already have an upcoming appointment" << endl;
+            myAppointmentsPage();
+        }
+
+        else if(!getCustomerByID(logged).getOnDose()) {
+            startDose(logged, getBestVaccine().getTag());
+            setAppointment(selectDate, selectTime, logged);
+            cout << "Your Appointment has been set" << endl << endl;
+            myAppointmentsPage();
+        }
+
+        else if(getCustomerByID(logged).getOnDose()) {
+            setAppointment(selectDate, selectTime, logged);
+            menuPage();
+        }
+
+        else {
+            
+        }
     }
 }
 
