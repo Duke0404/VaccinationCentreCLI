@@ -12,8 +12,8 @@ class Time {
     unsigned int hour;
 
     public:
-    unsigned int getMinute();
-    unsigned int getHour();
+    unsigned int getMinute() const;
+    unsigned int getHour() const;
 
     void setMinute(unsigned int min);
     void setHour(unsigned int hou);
@@ -27,15 +27,18 @@ class Time {
     friend ostream& operator<<(ostream& out, const Time& time);
 };
 
+bool operator<(const Time& LHS, const Time& RHS);
+bool operator>(const Time& LHS, const Time& RHS);
+
 class Date {
     unsigned int day;
     unsigned int month;
     unsigned int year;
 
     public:
-    unsigned int getDay();
-    unsigned int getMonth();
-    unsigned int getYear();
+    unsigned int getDay() const;
+    unsigned int getMonth() const;
+    unsigned int getYear() const;
 
     void setDay(unsigned int day);
     void setMonth(unsigned int month);
@@ -46,14 +49,15 @@ class Date {
 
     Date& operator=(const Date& RHS);
     Date operator+(const Date& RHS);
-    Date operator-(const Date& RHS);
+    Date operator-(const Date& RHS) const;
     Date& operator++();
     bool operator==(const Date& RHS) const;
     bool operator!=(const Date& RHS) const;
-    friend bool operator<(const Date& LHS, const Date& RHS);
-    friend bool operator>(const Date& LHS, const Date& RHS);
     friend ostream& operator<<(ostream& out, const Date& date);
 };
+
+bool operator<(const Date& LHS, const Date& RHS);
+bool operator>(const Date& LHS, const Date& RHS);
 
 class Appointment {
     Time time;
@@ -61,8 +65,8 @@ class Appointment {
     bool booked;
 
     public:
-    Time getTime() const;
-    unsigned int getAppointeeID();
+    const Time& getTime() const;
+    unsigned int getAppointeeID() const;
     bool getBooked() const;
 
     void setTime(Time time);
@@ -85,11 +89,13 @@ class Day {
     Appointment& refAppointmentByTime(Time time);
 
     public:
-    Date getDate();
-    Appointment getAppointmentByID(unsigned int ID);
-    Appointment getAppointmentByTime(Time time);
+    const Date& getDate() const;
+    const Appointment& getAppointmentByID(unsigned int ID) const;
+    const Appointment& getAppointmentByTime(Time time) const;
     bool getAllocated();
     unsigned int getAppointmentsPerDay();
+    const Time& getOpeningTime();
+    const Time& getClosingTime();
 
     void setDate(Date date);
     void setAllocated();
@@ -111,7 +117,7 @@ class Shipment {
     unsigned int index;
 
     public:
-    Date getExpiry();
+    const Date& getExpiry() const;
     unsigned int getQuantity();
     unsigned int getIndex();
 
@@ -137,10 +143,10 @@ class Vaccine {
     Shipment& refShipmentByIndex(unsigned int index);
 
     public:
-    unsigned int getTag();
-    string getCompany();
+    unsigned int getTag() const;
+    const string& getCompany();
     unsigned int getDosesRequired();
-    Date getBestBefore();
+    const Date& getBestBefore();
     bool getAvailable();
 
     void setTag(unsigned int tg);
@@ -152,8 +158,8 @@ class Vaccine {
     Vaccine();
     Vaccine(unsigned int tag, string company, unsigned int dosesReq, Date bestBefore);
 
-    Shipment getBestShipment();
-    Shipment getShipmentByIndex(unsigned int index);
+    const Shipment& getBestShipment();
+    const Shipment& getShipmentByIndex(unsigned int index);
 
     void restock(unsigned int qty, Date currDate, unsigned int idx);
 };
@@ -168,11 +174,11 @@ class Customer {
 
     public:
     unsigned int getID();
-    unsigned int getPIN();
-    string getName();
-    bool getOnDose();
+    unsigned int getPIN() const;
+    const string& getName() const;
+    bool getOnDose() const;
     unsigned int getTag();
-    unsigned int getDosesTaken();
+    unsigned int getDosesTaken() const;
 
     void setID(unsigned int ID);
     void setPIN(unsigned int PIN);
@@ -202,9 +208,11 @@ class Centre {
     Customer& refCustomerByID(unsigned int ID);
     Vaccine& refVaccineByTag(unsigned int tag);
 
+    void realizeAppointments();
+
     public:
-    string getName();
-    string getAddress();
+    const string& getName();
+    const string& getAddress();
 
     void setName(string name);
     void setAddress(string address);
@@ -221,19 +229,19 @@ class Centre {
     Centre();
     Centre(string name, string address, unsigned int allocatedDays, unsigned int appointmentsPerDay, Time startTime);
 
-    Customer getCustomerByID(unsigned int ID);
+    const Customer& getCustomerByID(unsigned int ID);
     bool authorizeLogin(unsigned int ID);
     void addCustomer(unsigned int login, unsigned int password, string name);
 
-    Day getDayByID(unsigned int ID);
-    Day getDayByDate(Date date);
+    const Day& getDayByID(unsigned int ID);
+    const Day& getDayByDate(Date date);
     bool checkDayByID(unsigned int ID);
     bool checkAppointmentByID(unsigned int ID);
     bool checkAppointmentByTime(Date date, Time time);
     void regenSchedule(unsigned int allocatedDays, Date startDate, unsigned int appointmentsPerDay, Time startTime);
 
-    Vaccine getVaccineByTag(unsigned int tag);
-    Vaccine getBestVaccine();
+    const Vaccine& getVaccineByTag(unsigned int tag);
+    const Vaccine& getBestVaccine();
 
     void startPage();
     void loginPage();

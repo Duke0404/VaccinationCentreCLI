@@ -1,10 +1,10 @@
 #include "vac.hpp"
 
-unsigned int Time::getMinute() {
+unsigned int Time::getMinute() const{
     return minute;
 }
 
-unsigned int Time::getHour() {
+unsigned int Time::getHour() const{
     return hour;
 }
 
@@ -52,17 +52,38 @@ ostream& operator<<(ostream& out, const Time& time) {
     return out;
 }
 
+bool operator<(const Time& LHS, const Time& RHS) {
+    if(LHS.getHour() < RHS.getHour())
+        return true;
+     else if(LHS.getHour() == RHS.getHour()) {
+        if(LHS.getMinute() < RHS.getMinute())
+            return true;
+    }
+
+    return false;
+}
+bool operator>(const Time& LHS, const Time& RHS) {
+    if(LHS.getHour() > RHS.getHour())
+        return true;
+     else if(LHS.getHour() == RHS.getHour()) {
+        if(LHS.getMinute() > RHS.getMinute())
+            return true;
+    }
+
+    return false;
+}
+
 /*----------------------------------------------------------------------------------------------------------------------------*/
 
-unsigned int Date::getDay() {
+unsigned int Date::getDay() const {
     return day;
 }
 
-unsigned int Date::getMonth() {
+unsigned int Date::getMonth() const {
     return month;
 }
 
-unsigned int Date::getYear() {
+unsigned int Date::getYear() const {
     return year;
 }
 
@@ -142,7 +163,7 @@ Date Date::operator+(const Date& RHS) {
     return result;
 }
 
-Date Date::operator-(const Date& RHS) {
+Date Date::operator-(const Date& RHS) const{
     unsigned int tempYear =  year - RHS.year;
 
     int tempMonth =  month - RHS.month;
@@ -207,15 +228,15 @@ bool Date::operator!=(const Date& RHS) const {
 }
 
 bool operator<(const Date& LHS, const Date& RHS) {
-    if(LHS.year < RHS.year)
+    if(LHS.getYear() < RHS.getYear())
         return true;
 
-    else if(LHS.year == RHS.year) {
-        if(LHS.month < RHS.month)
+    else if(LHS.getYear() == RHS.getYear()) {
+        if(LHS.getMonth() < RHS.getMonth())
             return true;
 
-        else if(LHS.month == RHS.month) {
-            if(LHS.day < RHS.day)
+        else if(LHS.getMonth() == RHS.getMonth()) {
+            if(LHS.getDay() < RHS.getDay())
                 return true;
         }
     }
@@ -224,15 +245,15 @@ bool operator<(const Date& LHS, const Date& RHS) {
 }
 
 bool operator>(const Date& LHS, const Date& RHS) {
-    if(LHS.year > RHS.year)
+    if(LHS.getYear() > RHS.getYear())
         return true;
 
-    else if(LHS.year == RHS.year) {
-        if(LHS.month > RHS.month)
+    else if(LHS.getYear() == RHS.getYear()) {
+        if(LHS.getMonth() > RHS.getMonth())
             return true;
 
-        else if(LHS.month == RHS.month) {
-            if(LHS.day > RHS.day)
+        else if(LHS.getMonth() == RHS.getMonth()) {
+            if(LHS.getDay() > RHS.getDay())
                 return true;
         }
     }
@@ -248,15 +269,15 @@ ostream& operator<<(ostream& out, const Date& date) {
 
 /*----------------------------------------------------------------------------------------------------------------------------*/
 
-Time Appointment::getTime() const {
+const Time& Appointment::getTime() const {
     return time;
 }
 
-unsigned int Appointment::getAppointeeID() {
+unsigned int Appointment::getAppointeeID() const {
     return appointeeID;
 }
 
-bool Appointment::getBooked() const{
+bool Appointment::getBooked() const {
     return booked;
 }
 
@@ -308,11 +329,11 @@ Appointment& Day::refAppointmentByTime(Time time) {
     throw invalid_argument("No Appointment at given time");
 }
 
-Date Day::getDate() {
+const Date& Day::getDate() const {
     return date;
 }
 
-Appointment Day::getAppointmentByID(unsigned int ID) {
+const Appointment& Day::getAppointmentByID(unsigned int ID) const {
     for(auto i = appointmentList.begin(); i != appointmentList.end(); ++i) {
         if ((*i).getAppointeeID() == ID)
             return *i;
@@ -321,13 +342,27 @@ Appointment Day::getAppointmentByID(unsigned int ID) {
     throw invalid_argument("No Appointment with given ID");
 }
 
-Appointment Day::getAppointmentByTime(Time time) {
+const Appointment& Day::getAppointmentByTime(Time time) const {
     for(auto i = appointmentList.begin(); i != appointmentList.end(); ++i) {
         if ((*i).getTime() == time)
             return *i;
     }
 
     throw invalid_argument("No Appointment at given time");
+}
+
+const Time& Day::getOpeningTime() {
+    if(appointmentList.size() == 0)
+        throw logic_error("No appointments");
+    
+    return appointmentList.front().getTime();
+}
+
+const Time& Day::getClosingTime() {
+    if(appointmentList.size() == 0)
+        throw logic_error("No appointments");
+    
+    return appointmentList.back().getTime();
 }
 
 bool Day::getAllocated() {
@@ -429,7 +464,7 @@ ostream& operator<<(ostream& out, const Day& day) {
 
 /*----------------------------------------------------------------------------------------------------------------------------*/
 
-Date Shipment::getExpiry() {
+const Date& Shipment::getExpiry() const {
     return expiry;
 }
 
@@ -492,11 +527,11 @@ Shipment& Vaccine::refShipmentByIndex(unsigned int index) {
     throw invalid_argument("No shipment with given index");
 }
 
-unsigned int Vaccine::getTag() {
+unsigned int Vaccine::getTag() const{
     return tag;
 }
 
-string Vaccine::getCompany() {
+const string& Vaccine::getCompany() {
     return company;
 }
 
@@ -504,7 +539,7 @@ unsigned int Vaccine::getDosesRequired() {
     return dosesRequired;
 }
 
-Date Vaccine::getBestBefore() {
+const Date& Vaccine::getBestBefore() {
     return bestBefore;
 }
 
@@ -550,11 +585,11 @@ Vaccine::Vaccine(unsigned int tag, string company, unsigned int dosesReq, Date b
     available = false;
 }
 
-Shipment Vaccine::getBestShipment() {
+const Shipment& Vaccine::getBestShipment() {
     return refBestShipment();
 }
 
-Shipment Vaccine::getShipmentByIndex(unsigned int index) {
+const Shipment& Vaccine::getShipmentByIndex(unsigned int index) {
     return refShipmentByIndex(index);
 }
 
@@ -569,15 +604,15 @@ unsigned int Customer::getID() {
     return ID;
 }
 
-unsigned int Customer::getPIN() {
+unsigned int Customer::getPIN() const {
     return PIN;
 }
 
-string Customer::getName() {
+const string& Customer::getName() const {
     return name;
 }
 
-bool Customer::getOnDose() {
+bool Customer::getOnDose() const {
     return onDose;
 }
 
@@ -585,7 +620,7 @@ unsigned int Customer::getTag() {
     return tag;
 }
 
-unsigned int Customer::getDosesTaken() {
+unsigned int Customer::getDosesTaken() const {
     return dosesTaken;
 }
 
@@ -669,11 +704,24 @@ Vaccine& Centre::refVaccineByTag(unsigned int tag) {
     throw invalid_argument("No vaccine with given tag is available");
 }
 
-string Centre::getName() {
+void Centre::realizeAppointments() {
+    for(auto i = dayList.begin(); i != dayList.end(); ++i) {
+        if ((*i).getDate() < currDate) {
+            for(Time t = startTime; t < (*i).getClosingTime(); t.increaseQuarter()) {
+                // if(getCustomerByID((*i).getAppointmentByTime(t).getAppointeeID()).getDosesTaken() + 1 == getVaccineByTag(getCustomerByID((*i).getAppointmentByTime(t).getAppointeeID()).getTag()).getDosesRequired())
+                //     refCustomerByID((*i).getAppointmentByTime(t).getAppointeeID()).pop_front();
+
+                refCustomerByID((*i).getAppointmentByTime(t).getAppointeeID()).setDosesTaken(getCustomerByID((*i).getAppointmentByTime(t).getAppointeeID()).getDosesTaken() + 1);
+            }
+        }
+    }
+}
+
+const string& Centre::getName() {
     return name;
 }
 
-string Centre::getAddress() {
+const string& Centre::getAddress() {
     return address;
 }
 
@@ -738,7 +786,7 @@ Centre::Centre(string name, string address, unsigned int allocatedDays, unsigned
     regenSchedule(allocatedDays, currDate, appointmentsPerDay, startTime);
 }
 
-Customer Centre::getCustomerByID(unsigned int ID) {
+const Customer& Centre::getCustomerByID(unsigned int ID) {
     for(auto i = customerList.begin(); i != customerList.end(); ++i) {
         if((*i).getID() == ID)
             return *i;
@@ -764,7 +812,7 @@ void Centre::addCustomer(unsigned int login, unsigned int password, string name)
     customerList.push_back(temp);
 }
 
-Day Centre::getDayByID(unsigned int ID) {
+const Day& Centre::getDayByID(unsigned int ID) {
     for(auto i = dayList.begin(); i != dayList.end(); ++i) {
         if((*i).checkAppointmentByID(ID))
             return *i;
@@ -773,7 +821,7 @@ Day Centre::getDayByID(unsigned int ID) {
     throw invalid_argument("No customer with such ID exists");
 }
 
-Day Centre::getDayByDate(Date date) {
+const Day& Centre::getDayByDate(Date date) {
     return refDayByDate(date);
 }
 
@@ -827,11 +875,11 @@ void Centre::regenSchedule(unsigned int allocatedDays, Date startDate, unsigned 
     }
 }
 
-Vaccine Centre::getVaccineByTag(unsigned int tag) {
+const Vaccine& Centre::getVaccineByTag(unsigned int tag) {
     return refVaccineByTag(tag);
 }
 
-Vaccine Centre::getBestVaccine() {
+const Vaccine& Centre::getBestVaccine() {
     Date left(1, 1, 1000);
     unsigned int tempTag;
 
@@ -845,6 +893,8 @@ Vaccine Centre::getBestVaccine() {
 }
 
 void Centre::startPage() {
+    realizeAppointments();
+
     cout << "START PAGE" << endl
     << "Enter number of the desired menu item" << endl
     << "(1) login" << endl
