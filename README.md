@@ -13,3 +13,12 @@ g++ vac_test.cpp vac.cpp -o vac_test
 
 ## Class Diagram
 ![UML Diagram](https://raw.githubusercontent.com/Duke0404/VaccinationCentreCLI/main/Classes.png)
+
+## Class Descriptions
+### Centre
+Serving as the main class of the program, the centre class is instantiated in the UI.cpp file and holds all of the data of the Vaccination centre, namely the records of customers, vaccines and deatils of each allocated day in the form of STL lists. It all of it's methods have are made with the purpose of retrieving or modifying data in these lists. In addition to this, the Centre class also holds the methoda that are used to display the UI of the CLI.
+
+### Customer
+This class works as an instance of a customer in the Vaccination centre and thus holds all of the data relevant to a customer including their personal details and details about whether they have been assigned a dose, their vaccine of choice & how many doses they have already been given.
+
+### 
