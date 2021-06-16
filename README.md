@@ -40,4 +40,8 @@ The Time class is a custom class to hold and perform actions on time information
 The Date class is a custom class to hold and perform actions on dates.
 
 ## Testing
-A number of unit-tests have been deployed in the ```vac_test.cpp``` file.
+A number of unit-tests have been deployed in the [```vac_test.cpp```](https://github.com/Duke0404/VaccinationCentreCLI/blob/main/vac_test.cpp) file.
+
+* For the purpose of testing, dedicated global functions for testing each class has been made where a test instance of the class and all the parameters of the class are entered to be verified. These global functions are then used in conditional statements to test the functioning of the class' methods.
+* All the exceptions that are programmed into the class methods are also tested using try catch blocks to ensure the security of the program
+* The output functions and methods in the program are not hard-coded to use standard input and output, thus we test tehir functioning using stringstreams.
