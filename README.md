@@ -3,11 +3,11 @@ The CLI works as a scheduling and information database for a particular Covid-19
 
 ## Usage
 For compiling the app:
-```
+```sh
 g++ UI.cpp vac.cpp -o vac
 ```
 For compiling the tests:
-```
+```sh
 g++ vac_test.cpp vac.cpp -o vac_test
 ```
 
