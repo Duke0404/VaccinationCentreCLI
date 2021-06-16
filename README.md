@@ -21,4 +21,23 @@ Serving as the main class of the program, the centre class is instantiated in th
 ### Customer
 This class works as an instance of a customer in the Vaccination centre and thus holds all of the data relevant to a customer including their personal details and details about whether they have been assigned a dose, their vaccine of choice & how many doses they have already been given.
 
-### 
+### Vaccine
+This serves as an instance to a particular vaccine, carrying information about a particular vaccine and also holding a list of previously stocked vaccine shipments. The methods of this class are meant to perform actions on the shipments stored in the shipmentList.
+
+### Shipment
+The shipment class serves as an extension to the vaccine class with data about a particular shipment of a vaccine. The purpose of this class is to manage the expiry dates of each unit of the vaccine.
+
+### Day
+The day class serves as a particular entry in the calendar. A number of it's instances are pre-instantiated by the Centre constructor in the dayList and data is put inside each day as appointemnts for that day are done. The data contained within, includes details of the day and a list of all appointments scheduled on that day.
+
+### Appointment
+Serving as an extension to the Day class, each Appointment's data is held by an instance of the class including data about the time of the appointment and who booked it.
+
+### Time
+The Time class is a custom class to hold and perform actions on time information.
+
+### Date
+The Date class is a custom class to hold and perform actions on dates.
+
+## Testing
+A number of unit-tests have been deployed in the ```vac_test.cpp``` file.
